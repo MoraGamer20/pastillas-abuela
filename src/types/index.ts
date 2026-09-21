@@ -11,6 +11,8 @@ export interface Medication {
   inventory_alert_threshold: number;
   pills_per_dose: number;
   active: boolean;
+  timing_label?: string;
+  last_deduction_date?: string; // YYYY-MM-DD
 }
 
 export interface Comment {

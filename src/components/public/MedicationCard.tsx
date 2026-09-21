@@ -59,15 +59,20 @@ export function PublicMedicationCard({ medication, comments, onAddComment }: Pub
               {medication.is_as_needed ? (
                 <span className="badge badge-warning">
                   <AlertCircle size={13} />
-                  <span>Uso SOS / Según Necesidad</span>
+                  <span>Uso SOS / En caso de dolor de pecho</span>
                 </span>
               ) : (
-                <span className="badge badge-info">
-                  <Clock size={13} />
-                  <span>
-                    {medication.schedule_time ? `Hora fija: ${medication.schedule_time}` : 'Pauta según comida'}
+                <>
+                  <span className="badge badge-info" style={{ fontWeight: 700 }}>
+                    <Clock size={13} />
+                    <span>{medication.schedule_time ? `Hora: ${medication.schedule_time}` : 'Pauta según comida'}</span>
                   </span>
-                </span>
+                  {medication.timing_label && (
+                    <span className="badge badge-neutral" style={{ fontSize: '0.72rem' }}>
+                      {medication.timing_label}
+                    </span>
+                  )}
+                </>
               )}
             </div>
           </div>

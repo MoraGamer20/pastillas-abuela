@@ -15,13 +15,24 @@ import {
 import { useMedications } from '../hooks/useMedications';
 import { HistoryLog } from '../components/admin/HistoryLog';
 import type { Medication } from '../types';
+import { Plus, Minus, RotateCcw, Sparkles } from 'lucide-react';
 
 export function AdminPanel() {
-  const { medications, history, loading, updateMedication, fetchHistory } = useMedications();
+  const {
+    medications,
+    history,
+    loading,
+    updateMedication,
+    fetchHistory,
+    markDoseSkipped,
+    recordExtraDose,
+    resetToPrescription
+  } = useMedications();
 
   // Search & Filter
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedHistory, setExpandedHistory] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
 
   // Modal States
   const [activeModal, setActiveModal] = useState<'refill' | 'adjust' | 'schedule' | null>(null);
@@ -35,6 +46,21 @@ export function AdminPanel() {
     fetchHistory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const notify = (msg: string) => {
+    setFeedbackMessage(msg);
+    setTimeout(() => setFeedbackMessage(null), 3500);
+  };
+
+  const handleSkipped = async (med: Medication) => {
+    await markDoseSkipped(med.id);
+    notify(`Dosis de ${med.name} reincorporada (+${med.pills_per_dose})`);
+  };
+
+  const handleExtra = async (med: Medication) => {
+    await recordExtraDose(med.id);
+    notify(`Toma extra de ${med.name} registrada (-${med.pills_per_dose})`);
+  };
 
   const openRefillModal = (med: Medication) => {
     setSelectedMed(med);
@@ -69,6 +95,7 @@ export function AdminPanel() {
       },
       `Nueva caja registrada: ${selectedMed.inventory_current} → ${modalCount} unidades`
     );
+    notify(`Nueva caja de ${selectedMed.name} registrada: ${modalCount} unidades`);
     closeModal();
   };
 
@@ -79,6 +106,7 @@ export function AdminPanel() {
       { inventory_current: modalCount },
       `Ajuste manual de inventario: ${selectedMed.inventory_current} → ${modalCount}`
     );
+    notify(`Stock de ${selectedMed.name} ajustado a ${modalCount} unidades`);
     closeModal();
   };
 
@@ -89,7 +117,15 @@ export function AdminPanel() {
       { schedule_time: modalScheduleTime || null },
       `Horario pautado actualizado: ${selectedMed.schedule_time || 'Sin hora'} → ${modalScheduleTime || 'Sin hora'}`
     );
+    notify(`Horario de ${selectedMed.name} actualizado a ${modalScheduleTime}`);
     closeModal();
+  };
+
+  const handleReset = () => {
+    if (confirm('¿Deseas reiniciar todos los medicamentos a los valores exactos iniciales de la receta médica?')) {
+      resetToPrescription();
+      notify('Receta reiniciada a los valores iniciales oficiales.');
+    }
   };
 
   const filteredMeds = useMemo(() => {
@@ -109,6 +145,29 @@ export function AdminPanel() {
 
   return (
     <div className="animate-fade-in">
+      {/* Toast Feedback Notification */}
+      {feedbackMessage && (
+        <div style={{
+          position: 'fixed',
+          bottom: '1.5rem',
+          right: '1.5rem',
+          backgroundColor: 'var(--text-primary)',
+          color: 'var(--bg-surface)',
+          padding: '0.75rem 1.25rem',
+          borderRadius: 'var(--radius-md)',
+          boxShadow: 'var(--shadow-lg)',
+          fontSize: '0.875rem',
+          fontWeight: 600,
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          <CheckCircle2 size={16} color="var(--status-ok-solid)" />
+          <span>{feedbackMessage}</span>
+        </div>
+      )}
+
       {/* Admin Title Bar */}
       <div style={{
         display: 'flex',
@@ -116,37 +175,66 @@ export function AdminPanel() {
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: '1rem',
-        marginBottom: '1.5rem',
+        marginBottom: '1rem',
         paddingBottom: '1rem',
         borderBottom: '1px solid var(--border-subtle)'
       }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
             <h1 style={{ fontSize: '1.5rem', margin: 0, fontWeight: 800 }}>
-              Gestión Farmacológica
+              Control y Auditoría de Tomas
             </h1>
-            <span className="badge badge-info">Modo Administrador</span>
+            <span className="badge badge-info">Modo Avanzado</span>
           </div>
           <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-            Control de lotes, ajustes de stock, asignación de horas exactas y auditoría de cambios.
+            El sistema audita y descuenta automáticamente las dosis en sus horarios fijados por la receta.
           </p>
         </div>
 
-        {/* Search Input */}
-        <div style={{ position: 'relative', width: '100%', maxWidth: '280px' }}>
-          <Search
-            size={16}
-            color="var(--text-muted)"
-            style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }}
-          />
-          <input
-            type="text"
-            placeholder="Filtrar medicamento..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="form-input"
-            style={{ paddingLeft: '2.25rem', paddingRight: '0.75rem', fontSize: '0.875rem' }}
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={handleReset}
+            className="btn btn-outline btn-sm"
+            title="Reiniciar a receta original"
+            style={{ fontSize: '0.75rem' }}
+          >
+            <RotateCcw size={13} />
+            <span>Restablecer Receta</span>
+          </button>
+
+          {/* Search Input */}
+          <div style={{ position: 'relative', width: '100%', maxWidth: '240px' }}>
+            <Search
+              size={15}
+              color="var(--text-muted)"
+              style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }}
+            />
+            <input
+              type="text"
+              placeholder="Buscar fármaco..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="form-input"
+              style={{ paddingLeft: '2.25rem', paddingRight: '0.75rem', fontSize: '0.8125rem' }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Auto-deduction banner */}
+      <div style={{
+        backgroundColor: 'var(--status-info-bg)',
+        border: '1px solid var(--status-info-border)',
+        borderRadius: 'var(--radius-md)',
+        padding: '0.875rem 1rem',
+        marginBottom: '1.25rem',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '0.75rem'
+      }}>
+        <Sparkles size={20} color="var(--status-info-solid)" style={{ flexShrink: 0, marginTop: '0.125rem' }} />
+        <div style={{ fontSize: '0.8125rem', color: 'var(--status-info-text)' }}>
+          <strong>Descuento y Auditoría Activa:</strong> Cada día a la hora fijada por la receta médica, el sistema descuenta la dosis de la abuela. Si la abuela olvidó una toma o tomó una de más, usa los botones <strong>"+ Omitida"</strong> o <strong>"- Extra"</strong> para cuadrar el pastillero al instante.
         </div>
       </div>
 
@@ -171,7 +259,7 @@ export function AdminPanel() {
                   paddingBottom: '0.75rem',
                   borderBottom: '1px solid var(--border-subtle)'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <h3 style={{ fontSize: '1.125rem', margin: 0, fontWeight: 700, color: 'var(--text-primary)' }}>
                       {med.name}
                     </h3>
@@ -180,44 +268,68 @@ export function AdminPanel() {
                     </span>
                     {med.is_as_needed ? (
                       <span className="badge badge-warning" style={{ fontSize: '0.7rem' }}>
-                        Según Necesidad (SOS)
+                        Uso SOS (Dolor pecho)
                       </span>
                     ) : (
                       <span className="badge badge-info" style={{ fontSize: '0.7rem' }}>
                         <Clock size={12} />
-                        {med.schedule_time ? med.schedule_time : 'Sin hora fija'}
+                        {med.schedule_time ? `Pauta: ${med.schedule_time}` : 'Sin hora fija'}
                       </span>
                     )}
                   </div>
 
-                  {/* Quick Action Buttons */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {/* Fast Auditor Buttons */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', flexWrap: 'wrap' }}>
                     {!med.is_as_needed && (
-                      <button
-                        onClick={() => openScheduleModal(med)}
-                        className="btn btn-secondary btn-sm"
-                        title="Asignar o modificar horario"
-                      >
-                        <Clock size={14} />
-                        <span>Horario</span>
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleSkipped(med)}
+                          className="btn btn-secondary btn-sm"
+                          title="Si la abuela no se la tomó hoy, devuelve la dosis al pastillero"
+                          style={{ fontSize: '0.75rem' }}
+                        >
+                          <Plus size={13} />
+                          <span>Omitida (+{med.pills_per_dose})</span>
+                        </button>
+                        <button
+                          onClick={() => handleExtra(med)}
+                          className="btn btn-secondary btn-sm"
+                          title="Si tomó una dosis extra o manual"
+                          style={{ fontSize: '0.75rem' }}
+                        >
+                          <Minus size={13} />
+                          <span>Extra (-{med.pills_per_dose})</span>
+                        </button>
+                      </>
                     )}
                     <button
                       onClick={() => openRefillModal(med)}
                       className="btn btn-secondary btn-sm"
                       title="Registrar nueva caja comprada"
+                      style={{ fontSize: '0.75rem' }}
                     >
-                      <Package size={14} />
+                      <Package size={13} />
                       <span>Nueva Caja</span>
                     </button>
                     <button
                       onClick={() => openAdjustModal(med)}
                       className="btn btn-outline btn-sm"
-                      title="Ajustar stock actual"
+                      title="Ajustar stock exacto"
+                      style={{ fontSize: '0.75rem' }}
                     >
-                      <Edit size={14} />
+                      <Edit size={13} />
                       <span>Ajustar Stock</span>
                     </button>
+                    {!med.is_as_needed && (
+                      <button
+                        onClick={() => openScheduleModal(med)}
+                        className="btn btn-ghost btn-sm"
+                        title="Modificar horario"
+                        style={{ fontSize: '0.75rem' }}
+                      >
+                        <Clock size={13} />
+                      </button>
+                    )}
                   </div>
                 </div>
 
