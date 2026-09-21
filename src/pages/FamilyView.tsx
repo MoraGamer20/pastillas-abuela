@@ -70,8 +70,8 @@ export function FamilyView() {
           {/* Vital Signs Grid from Prescription */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-            gap: '0.75rem',
+            gridTemplateColumns: '1fr',
+            gap: '0.625rem',
             padding: '0.875rem',
             backgroundColor: 'var(--bg-subtle)',
             borderRadius: 'var(--radius-sm)',

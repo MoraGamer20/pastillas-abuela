@@ -93,11 +93,11 @@ export function PublicMedicationCard({ medication, comments, onAddComment }: Pub
           </div>
         </div>
 
-        {/* Content Details: Responsive Grid */}
+        {/* Content Details: Single column on mobile, two on larger screens */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '1rem',
+          gridTemplateColumns: 'minmax(0, 1fr)',
+          gap: '0.875rem',
           marginBottom: '1rem'
         }}>
           {/* Dose Info */}
