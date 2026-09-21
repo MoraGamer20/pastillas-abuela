@@ -1,0 +1,127 @@
+import { Link, useLocation } from 'react-router-dom';
+import { LogOut, Settings, Moon, Sun, ShieldCheck } from 'lucide-react';
+import { useTheme } from '../../hooks/useTheme';
+
+export function Header() {
+  const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
+  const isAdmin = sessionStorage.getItem('adminAuth') === 'true';
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('adminAuth');
+    window.location.href = '/';
+  };
+
+  const todayFormatted = new Intl.DateTimeFormat('es-ES', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).format(new Date());
+
+  // Capitalize first letter of weekday
+  const capitalizedDate = todayFormatted.charAt(0).toUpperCase() + todayFormatted.slice(1);
+
+  return (
+    <header style={{
+      backgroundColor: 'var(--bg-surface)',
+      borderBottom: '1px solid var(--border-subtle)',
+      position: 'sticky',
+      top: 0,
+      zIndex: 100,
+      boxShadow: 'var(--shadow-xs)'
+    }}>
+      <div className="app-container" style={{ padding: '0.875rem 1rem' }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '0.75rem'
+        }}>
+          
+          {/* Brand & Identity */}
+          <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--primary-subtle)',
+              border: '1px solid var(--primary-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--primary)',
+              flexShrink: 0
+            }}>
+              <ShieldCheck size={24} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{
+                  fontSize: '1.125rem',
+                  fontWeight: 800,
+                  color: 'var(--text-primary)',
+                  letterSpacing: '-0.02em'
+                }}>
+                  Control Farmacológico
+                </span>
+                <span className="badge badge-info" style={{ fontSize: '0.7rem', padding: '0.15rem 0.4rem' }}>
+                  Familiar
+                </span>
+              </div>
+              <p style={{
+                margin: 0,
+                fontSize: '0.8125rem',
+                color: 'var(--text-muted)',
+                fontWeight: 500
+              }}>
+                Paciente: Alicia Reyes Limas • {capitalizedDate}
+              </p>
+            </div>
+          </Link>
+
+          {/* Right Controls: Theme Toggle & Admin Access */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="btn-icon"
+              title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              aria-label="Alternar modo oscuro"
+            >
+              {theme === 'dark' ? <Sun size={18} color="#f59e0b" /> : <Moon size={18} />}
+            </button>
+
+            {isAdmin ? (
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                {location.pathname !== '/admin' && (
+                  <Link to="/admin" className="btn btn-secondary btn-sm">
+                    <Settings size={15} />
+                    <span>Panel</span>
+                  </Link>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="btn btn-outline btn-sm"
+                  style={{ color: 'var(--status-danger-text)' }}
+                >
+                  <LogOut size={15} />
+                  <span>Salir</span>
+                </button>
+              </div>
+            ) : (
+              location.pathname !== '/admin/login' && (
+                <Link to="/admin/login" className="btn btn-outline btn-sm">
+                  <Settings size={15} />
+                  <span>Administrar</span>
+                </Link>
+              )
+            )}
+          </div>
+
+        </div>
+      </div>
+    </header>
+  );
+}
