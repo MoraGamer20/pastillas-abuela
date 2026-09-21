@@ -153,7 +153,7 @@ export function FamilyView() {
       <div className="dashboard-grid">
         
         {/* Main Column: Medication Feed */}
-        <div>
+        <div style={{ minWidth: 0, width: '100%', maxWidth: '100%' }}>
           <MedicationList />
         </div>
 

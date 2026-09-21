@@ -33,52 +33,26 @@ export function PublicMedicationCard({ medication, comments, onAddComment }: Pub
       }}
     >
       <div className="card-body-clean" style={{ padding: '1.25rem' }}>
-        {/* Header: Name, Dosage and Status Badge */}
+        {/* Header Top Row: Name, Dosage and Stock Badge */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          flexWrap: 'wrap',
-          gap: '0.75rem',
-          marginBottom: '1rem',
-          paddingBottom: '0.875rem',
-          borderBottom: '1px solid var(--border-subtle)'
+          alignItems: 'center',
+          gap: '0.5rem',
+          marginBottom: '0.625rem',
+          width: '100%'
         }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: 700, color: 'var(--text-primary)' }}>
-                {medication.name}
-              </h3>
-              <span className="badge badge-neutral badge-lg" style={{ fontFamily: 'var(--font-mono)' }}>
-                {medication.dosage}
-              </span>
-            </div>
-
-            {/* Time / Mode Tag */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
-              {medication.is_as_needed ? (
-                <span className="badge badge-warning">
-                  <AlertCircle size={13} />
-                  <span>Uso SOS / En caso de dolor de pecho</span>
-                </span>
-              ) : (
-                <>
-                  <span className="badge badge-info" style={{ fontWeight: 700 }}>
-                    <Clock size={13} />
-                    <span>{medication.schedule_time ? `Hora: ${medication.schedule_time}` : 'Pauta según comida'}</span>
-                  </span>
-                  {medication.timing_label && (
-                    <span className="badge badge-neutral" style={{ fontSize: '0.72rem' }}>
-                      {medication.timing_label}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', minWidth: 0 }}>
+            <h3 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 700, color: 'var(--text-primary)' }}>
+              {medication.name}
+            </h3>
+            <span className="badge badge-neutral" style={{ fontFamily: 'var(--font-mono)' }}>
+              {medication.dosage}
+            </span>
           </div>
 
           {/* Stock State Badge */}
-          <div>
+          <div style={{ flexShrink: 0 }}>
             {isAgotado ? (
               <span className="badge badge-danger">
                 <AlertTriangle size={13} />
@@ -96,6 +70,47 @@ export function PublicMedicationCard({ medication, comments, onAddComment }: Pub
               </span>
             )}
           </div>
+        </div>
+
+        {/* Schedule & Timing Row */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          flexWrap: 'wrap',
+          marginBottom: '1rem',
+          paddingBottom: '0.75rem',
+          borderBottom: '1px solid var(--border-subtle)',
+          width: '100%'
+        }}>
+          {medication.is_as_needed ? (
+            <span className="badge badge-warning">
+              <AlertCircle size={13} />
+              <span>Uso SOS / En caso de dolor de pecho</span>
+            </span>
+          ) : (
+            <>
+              <span className="badge badge-info" style={{ fontWeight: 700, flexShrink: 0 }}>
+                <Clock size={13} />
+                <span>{medication.schedule_time ? `Hora: ${medication.schedule_time}` : 'Pauta según comida'}</span>
+              </span>
+              {medication.timing_label && (
+                <span style={{
+                  fontSize: '0.8125rem',
+                  color: 'var(--text-secondary)',
+                  backgroundColor: 'var(--bg-subtle)',
+                  padding: '0.2rem 0.6rem',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-subtle)',
+                  lineHeight: 1.35,
+                  wordBreak: 'break-word',
+                  maxWidth: '100%'
+                }}>
+                  {medication.timing_label}
+                </span>
+              )}
+            </>
+          )}
         </div>
 
         {/* Content Details: 1 column on mobile, 2 columns on tablet/desktop */}
