@@ -98,13 +98,8 @@ export function PublicMedicationCard({ medication, comments, onAddComment }: Pub
           </div>
         </div>
 
-        {/* Content Details: Single column on mobile, two on larger screens */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr)',
-          gap: '0.875rem',
-          marginBottom: '1rem'
-        }}>
+        {/* Content Details: 1 column on mobile, 2 columns on tablet/desktop */}
+        <div className="med-details-grid">
           {/* Dose Info */}
           <div style={{
             backgroundColor: 'var(--bg-subtle)',

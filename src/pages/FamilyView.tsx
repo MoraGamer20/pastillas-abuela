@@ -68,15 +68,7 @@ export function FamilyView() {
           </div>
 
           {/* Vital Signs Grid from Prescription */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr',
-            gap: '0.625rem',
-            padding: '0.875rem',
-            backgroundColor: 'var(--bg-subtle)',
-            borderRadius: 'var(--radius-sm)',
-            border: '1px solid var(--border-subtle)'
-          }}>
+          <div className="vitals-grid">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
               <Activity size={18} color="var(--primary)" />
               <div>

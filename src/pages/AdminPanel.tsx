@@ -279,7 +279,7 @@ export function AdminPanel() {
                   </div>
 
                   {/* Fast Auditor Buttons */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', flexWrap: 'wrap' }}>
+                  <div className="admin-actions-bar">
                     {!med.is_as_needed && (
                       <>
                         <button
@@ -334,13 +334,7 @@ export function AdminPanel() {
                 </div>
 
                 {/* Details Grid */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '0.875rem',
-                  marginBottom: '0.875rem',
-                  fontSize: '0.875rem'
-                }}>
+                <div className="admin-med-grid">
                   <div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                       Pauta Médica

@@ -59,62 +59,64 @@ export function Header() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span style={{
-                  fontSize: '1.125rem',
+                  fontSize: '1.05rem',
                   fontWeight: 800,
                   color: 'var(--text-primary)',
                   letterSpacing: '-0.02em'
                 }}>
-                  Control Farmacológico
+                  Control de Pastillas
                 </span>
-                <span className="badge badge-info" style={{ fontSize: '0.7rem', padding: '0.15rem 0.4rem' }}>
+                <span className="badge badge-info" style={{ fontSize: '0.68rem', padding: '0.15rem 0.4rem' }}>
                   Familiar
                 </span>
               </div>
               <p style={{
                 margin: 0,
-                fontSize: '0.8125rem',
+                fontSize: '0.75rem',
                 color: 'var(--text-muted)',
                 fontWeight: 500
               }}>
-                Paciente: Alicia Reyes Limas • {capitalizedDate}
+                <span className="hide-on-mobile">Paciente: </span>Alicia Reyes • <span className="hide-on-mobile">{capitalizedDate}</span><span className="hide-on-desktop">Hoy</span>
               </p>
             </div>
           </Link>
 
           {/* Right Controls: Theme Toggle & Admin Access */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
               className="btn-icon"
               title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
               aria-label="Alternar modo oscuro"
+              style={{ width: '36px', height: '36px' }}
             >
-              {theme === 'dark' ? <Sun size={18} color="#f59e0b" /> : <Moon size={18} />}
+              {theme === 'dark' ? <Sun size={17} color="#f59e0b" /> : <Moon size={17} />}
             </button>
 
             {isAdmin ? (
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center' }}>
                 {location.pathname !== '/admin' && (
-                  <Link to="/admin" className="btn btn-secondary btn-sm">
-                    <Settings size={15} />
-                    <span>Panel</span>
+                  <Link to="/admin" className="btn btn-secondary btn-sm" style={{ padding: '0.375rem 0.625rem', fontSize: '0.75rem' }}>
+                    <Settings size={14} />
+                    <span className="hide-on-mobile">Panel</span>
                   </Link>
                 )}
                 <button
                   onClick={handleLogout}
                   className="btn btn-outline btn-sm"
-                  style={{ color: 'var(--status-danger-text)' }}
+                  style={{ color: 'var(--status-danger-text)', padding: '0.375rem 0.625rem', fontSize: '0.75rem' }}
+                  title="Cerrar Sesión"
                 >
-                  <LogOut size={15} />
-                  <span>Salir</span>
+                  <LogOut size={14} />
+                  <span className="hide-on-mobile">Salir</span>
                 </button>
               </div>
             ) : (
               location.pathname !== '/admin/login' && (
-                <Link to="/admin/login" className="btn btn-outline btn-sm">
-                  <Settings size={15} />
-                  <span>Administrar</span>
+                <Link to="/admin/login" className="btn btn-outline btn-sm" style={{ padding: '0.375rem 0.625rem', fontSize: '0.75rem' }}>
+                  <Settings size={14} />
+                  <span className="hide-on-mobile">Administrar</span>
                 </Link>
               )
             )}
